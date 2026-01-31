@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head>
+    <title>LoomTrack | Worker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/workers.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="nav-toggle" id="navToggle">☰</div>
+
+      <div class="nav-left" >
+        <span class="logo">LoomTrack</span>
+      </div>
+
+      <div class="nav-center" id="navMenu">        
+        <a href="dashboard.html">Dashboard</a>
+        <a class="act" href="workers.html">Workers</a>
+        <a href="beams.html">Beams</a>
+        <a href="production.html">Production</a>
+        <a href="reports.html">Reports</a>
+      </div>
+
+      <div class="nav-right">
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    <div class="container">
+      <div class="card wide-card">
+        <h2 class="page-title">Workers</h2>
+
+        <!-- ADD WORKER -->
+        <div class="form-row">
+          <input type="text" id="workerName" placeholder="Worker Name" />
+          <input
+            type="text"
+            id="workerPhone"
+            placeholder="Phone Number (optional)"
+          />
+          <button id="addWorkerBtn" class="primary-btn">Add Worker</button>
+        </div>
+
+        <p id="msg" class="info-text"></p>
+
+        <!-- WORKER TABLE -->
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Worker Name</th>
+                <th>Phone Number</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="workerTableBody">
+              <!-- injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/workers.js"></script>
+    <script type="module" src="js/logout.js"></script>
+  </body>
+</html>

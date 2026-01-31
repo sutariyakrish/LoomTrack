@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LoomTrack | Beam</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/workers.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-toggle" id="navToggle">☰</div>
+
+      <div class="nav-left">
+        <span class="logo">LoomTrack</span>
+      </div>
+
+      <div class="nav-center" id="navMenu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="workers.html">Workers</a>
+        <a class="act" href="beams.html">Beams</a>
+        <a href="production.html">Production</a>
+        <a href="reports.html">Reports</a>
+      </div>
+
+      <div class="nav-right">
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="card wide-card">
+        <h2 class="page-title">Beams</h2>
+
+        <!-- MACHINE SELECT -->
+        <div class="form-row">
+          <select id="machineSelect">
+            <option value="">Select Machine</option>
+          </select>
+        </div>
+
+        <!-- ACTIVE BEAM INFO -->
+        <div id="beamInfo" class="beam-info"></div>
+
+
+        <!-- ADD BEAM -->
+        <div id="addBeamSection" style="display: none">
+          <div class="form-row">
+            <input type="text" id="beamNo" placeholder="Beam No / ID" />
+            <input type="number" id="beamMeters" placeholder="Total Meters" />
+            <button class="primary-btn" id="addBeamBtn">Add Beam</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/beams.js"></script>
+    <script type="module" src="js/logout.js"></script>
+  </body>
+</html>

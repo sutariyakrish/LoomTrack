@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LoomTrack | Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/workers.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-toggle" id="navToggle">☰</div>
+
+      <div class="nav-left">
+        <span class="logo">LoomTrack</span>
+      </div>
+
+      <div class="nav-center" id="navMenu">
+        <a class="act" href="dashboard.html">Dashboard</a>
+        <a href="workers.html">Workers</a>
+        <a href="beams.html">Beams</a>
+        <a href="production.html">Production</a>
+        <a href="reports.html">Reports</a>
+      </div>
+
+      <div class="nav-right">
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="card wide-card">
+        <h2 class="page-title">Dashboard</h2>
+        <h3 class="today-date" style="margin-top: 30px"></h3>
+        <div class="summary-grid" id="todayStats"></div>
+
+        <h3 class="today-month" style="margin-top: 30px"></h3>
+        <div class="summary-grid" id="monthStats"></div>
+      </div>
+    </div>
+    <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/protect.js"></script>
+    <script type="module" src="js/logout.js"></script>
+  </body>
+</html>

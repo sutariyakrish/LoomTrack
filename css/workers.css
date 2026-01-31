@@ -1,0 +1,315 @@
+/* ================= WORKERS PAGE ================= */
+
+/* Page title */
+.page-title {
+  margin-bottom: 24px;
+  color: #1a3a5f;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* Wider card for dashboard-style pages */
+.wide-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-width: 1100px;
+  min-width: 450px;
+  width: 100%;
+  padding: 30px 30px 35px;
+  flex-wrap: wrap;
+  position: relative;
+  top: 65px;
+  z-index: 0;
+}
+
+/* ---------------- FORM ROW ---------------- */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.form-row input {
+  padding: 12px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.95rem;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+  background-color: #fff;
+}
+
+.form-row input:focus {
+  border-color: #2b5797;
+  box-shadow: 0 0 0 2px rgba(43, 87, 151, 0.1);
+}
+
+/* ---------------- PRIMARY BUTTON ---------------- */
+.primary-btn {
+  background-color: #337ab7;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.primary-btn:hover {
+  background-color: #286090;
+}
+
+.primary-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---------------- INFO / STATUS TEXT ---------------- */
+.info-text {
+  margin: 8px 0 16px;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* ---------------- TABLE ---------------- */
+/* Wrapper → enables smooth horizontal scroll on mobile */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 16px;
+  border-radius: 12px;
+}
+
+/* Main table */
+.data-table {
+  width: 100%;
+  min-width: 650px; /* important for mobile */
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.data-table thead {
+  background-color: #1a3a5f; /* same as navbar */
+}
+
+.data-table th {
+  color: #ffffff;
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+/* Body cells */
+.data-table td {
+  padding: 13px 18px;
+  font-size: 14px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+/* Row divider */
+.data-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Zebra rows */
+.data-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* Hover */
+.data-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Action buttons */
+.data-table td button {
+  background-color: #1a3a5f;
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.data-table td button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .data-table th,
+  .data-table td {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 900px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .primary-btn {
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: 1.35rem;
+  }
+}
+.form-row{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.summary-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.summary-card {
+  min-width: 100px;
+  background: rgb(26, 58, 95);
+  color: white;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);  
+  border-radius: 10px;
+}
+
+.summary-card h4 {
+  font-size: 13px;
+  color: #ffffff;
+  margin-bottom: 8px;
+  
+}
+
+.summary-card p {
+  font-size: 20px;
+  
+  color: #ffffff;
+}
+.beam-info {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+  line-height: 1.6;
+  color: #1a3a5f;
+}
+select{
+  height: 40px;
+}
+/* ================= RESPONSIVE OVERRIDES (WORKERS PAGE) ================= */
+
+/* Tablets & small laptops */
+@media (max-width: 900px) {
+
+  .wide-card {
+    min-width: 0;
+    max-width: 100%;
+    padding: 25px 20px 30px;
+    top: 70px;
+  }
+
+  .summary-grid {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .summary-card {
+    flex: 1 1 140px;
+    text-align: center;
+  }
+}
+
+/* Phones */
+@media (max-width: 600px) {
+
+  .page-title {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .wide-card {
+    padding: 20px 15px 25px;
+    top: 75px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .form-row input,
+  .form-row select {
+    width: 100%;
+  }
+
+  .primary-btn {
+    width: 100%;
+    padding: 11px;
+  }
+
+  .summary-grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary-card {
+    width: 100%;
+  }
+
+  .table-wrapper {
+    margin-top: 12px;
+    border-radius: 10px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+
+  .page-title {
+    font-size: 1.15rem;
+  }
+
+  .summary-card {
+    padding: 14px;
+  }
+
+  .summary-card p {
+    font-size: 18px;
+  }
+
+  .data-table {
+    min-width: 580px;
+  }
+}

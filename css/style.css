@@ -1,0 +1,314 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: #f0f2f5;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  
+}
+
+.card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 35px;
+  color: #1a3a5f;
+}
+
+.brand i {
+  font-size: 1.8rem;
+}
+
+.brand h1 {
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group i:not(.lock-icon-right) {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.input-group input:focus {
+  border-color: #2b5797;
+}
+
+/* Submit Button */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #337ab7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #286090;
+}
+#factoryList {
+  width: 100%;
+  padding: 12px 15px 12px 12px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  font-size: 1rem;
+}
+/* ================= NAVBAR ================= */
+
+.navbar {
+  z-index: 99;
+  height: 60px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  background-color: #1a3a5f; /* matches your theme */
+  padding: 12px 20px;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Center links */
+.nav-center {
+  display: flex;
+  gap: 18px;
+}
+
+a {
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 4px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: #ffffff;
+  border-bottom: 2px solid #93c5fd;
+}
+.act {
+  color: #ffffff;
+  border-bottom: 2px solid #93c5fd;
+}
+
+/* Logout button */
+.nav-right button {
+  background-color: #ef4444;
+  border: none;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.nav-right button:hover {
+  background-color: #dc2626;
+}
+
+/* Mobile toggle */
+.nav-toggle {
+  display: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+  .navbar{
+    width: 100%;
+  }
+  .nav-center {
+    width: 100%;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background-color: #1a3a5f;
+    flex-direction: column;
+    padding: 15px 20px;
+    display: none;
+  }
+
+  .nav-center a {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .nav-center.active {
+    display: flex;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+  .logo {
+    font-size: 16px;
+  }
+}
+/* ================= RESPONSIVE FIXES (NON-NAVBAR) ================= */
+
+/* Small laptops & tablets */
+@media (max-width: 768px) {
+
+  body {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .container {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .card {
+    margin-top: 90px; /* avoids navbar overlap */
+    padding: 30px 22px;
+    border-radius: 10px;
+  }
+
+  .brand h1 {
+    font-size: 1.3rem;
+  }
+
+  .input-group input,
+  #factoryList {
+    font-size: 0.95rem;
+    padding: 11px 14px 11px 42px;
+  }
+
+  .login-btn {
+    padding: 11px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+
+  .container {
+    padding: 12px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 18px;
+    margin-top: 80px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  }
+
+  .brand {
+    margin-bottom: 25px;
+    gap: 8px;
+  }
+
+  .brand i {
+    font-size: 1.5rem;
+  }
+
+  .brand h1 {
+    font-size: 1.2rem;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-group i:not(.lock-icon-right) {
+    left: 12px;
+    font-size: 0.9rem;
+  }
+
+  .input-group input,
+  #factoryList {
+    padding: 10px 12px 10px 38px;
+    font-size: 0.9rem;
+  }
+
+  .login-btn {
+    padding: 10px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+
+  .brand h1 {
+    font-size: 1.1rem;
+  }
+
+  .card {
+    padding: 20px 14px;
+  }
+
+  .login-btn {
+    font-size: 0.85rem;
+  }
+}

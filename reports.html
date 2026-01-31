@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LoomTrack | Report</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/workers.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="nav-toggle" id="navToggle">☰</div>
+
+      <div class="nav-left">
+        <span class="logo">LoomTrack</span>
+      </div>
+
+      <div class="nav-center" id="navMenu">
+        <a href="dashboard.html">Dashboard</a>
+        <a  href="workers.html">Workers</a>
+        <a href="beams.html">Beams</a>
+        <a href="production.html">Production</a>
+        <a class="act" href="reports.html">Reports</a>
+      </div>
+
+      <div class="nav-right">
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="card wide-card">
+        <h2 class="page-title">Reports</h2>
+
+        <!-- FILTERS -->
+        <div class="form-row">
+  <select id="dateMode">
+    <option value="">Select Time Period</option>
+    <option value="day">Single Day</option>
+    <option value="range">Date Range</option>
+    <option value="month">Month</option>
+  </select>
+
+  <input type="date" id="singleDay" style="display:none;">
+  <input type="date" id="fromDate" style="display:none;">
+  <input type="date" id="toDate" style="display:none;">
+  <input type="month" id="monthSelect" style="display:none;">
+
+  
+  <select id="tableType" >
+  <option value="worker">Worker-wise</option>
+  <option value="machine">Machine-wise</option>
+  <option value="shift">Shift-wise</option>
+  <option value="beam">Beam-wise</option>
+  <option value="taka">Taka-wise</option>
+
+</select>
+<select id="beamStatusFilter" style=" display:none;">
+  <option value="active">Active Beams</option>
+  <option value="inactive">Inactive Beams</option>
+</select>
+<button class="primary-btn" id="loadReportBtn">
+    Load Reports
+  </button>
+
+
+</div>
+
+
+
+
+
+<!-- REPORT TABLE -->
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead id="reportHead"></thead>
+    <tbody id="reportBody"></tbody>
+  </table>
+</div>
+<button class="primary-btn" id="exportBtn" style="background:#16a34a;">
+  Export
+</button>
+
+    <script type="module" src="js/reports.js"></script>
+    <script type="module" src="js/logout.js"></script>
+  </body>
+</html>

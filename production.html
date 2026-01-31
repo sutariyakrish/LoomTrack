@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LoomTrack | Production</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/workers.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="nav-toggle" id="navToggle">☰</div>
+
+      <div class="nav-left">
+        <span class="logo">LoomTrack</span>
+      </div>
+
+      <div class="nav-center" id="navMenu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="workers.html">Workers</a>
+        <a href="beams.html">Beams</a>
+        <a class="act" href="production.html">Production</a>
+        <a href="reports.html">Reports</a>
+      </div>
+
+      <div class="nav-right">
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="card wide-card">
+        <h2 class="page-title">Production Entry</h2>
+
+        <div class="form-row">
+          <select id="machineSelect">
+            <option value="">Select Machine</option>
+          </select>
+
+          <select id="workerSelect">
+            <option value="">Select Worker</option>
+          </select>
+
+          <select id="shiftSelect">
+            <option value="">Select Shift</option>
+            <option value="Day">Day</option>
+            <option value="Night">Night</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <input type="text" id="takaNo" placeholder="Taka No" />
+          <input type="number" id="meters" placeholder="Produced Meters" />
+          <input type="date" id="productionDate" />
+
+          <button class="primary-btn" id="saveBtn">Save</button>
+        </div>
+
+        <p id="infoText" class="info-text"></p>
+        <div class="form-row">
+          <input type="date" id="productionDate" />
+          <button class="primary-btn" id="loadProductionBtn">
+            Load Production
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Machine</th>
+                <th>Worker</th>
+                <th>Taka No</th>
+                <th>Meters</th>
+                <th>Shift</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productionTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/production.js"></script>
+    <script type="module" src="js/logout.js"></script>
+  </body>
+</html>
