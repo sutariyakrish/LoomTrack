@@ -50,24 +50,31 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function loadMachines() {
-  const q = query(
-    collection(db, "factories", factoryId, "machines"),
-    orderBy("machineNumber", "asc")
+  const snap = await getDocs(
+    collection(db, "factories", factoryId, "machines")
   );
-
-  const snap = await getDocs(q);
 
   machineSelect.innerHTML = `<option value="">Select Machine</option>`;
 
-  snap.forEach(docSnap => {
-    const m = docSnap.data();
+  const machines = snap.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  }));
+
+  // 🔥 FORCE NUMERIC SORT
+  machines.sort(
+    (a, b) => Number(a.machineNumber) - Number(b.machineNumber)
+  );
+
+  machines.forEach(m => {
     const option = document.createElement("option");
-    option.value = docSnap.id;
+    option.value = m.id;
     option.textContent = `Machine ${m.machineNumber}`;
     option.dataset.machineNumber = m.machineNumber;
     machineSelect.appendChild(option);
   });
 }
+
 
 
 
@@ -197,6 +204,7 @@ async function calculateBeamStats(beamId, totalMeters) {
     shortagePercent,
   };
 }
+
 
 
 
