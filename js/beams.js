@@ -9,13 +9,20 @@ import {
   serverTimestamp,
   doc,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
+import { Timestamp } from
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 const machineSelect = document.getElementById("machineSelect");
 const beamInfo = document.getElementById("beamInfo");
 const addBeamSection = document.getElementById("addBeamSection");
 const addBeamBtn = document.getElementById("addBeamBtn");
+const beamStartDateInput =
+  document.getElementById("beamStartDate");
+
+// Default = today
+beamStartDateInput.value =
+  new Date().toISOString().split("T")[0];
 
 let factoryId = null;
 let selectedMachine = null;
@@ -122,7 +129,12 @@ addBeamBtn.addEventListener("click", async () => {
     where("machineId", "==", selectedMachine.id),
     where("isActive", "==", true),
   );
+  const selectedDate = beamStartDateInput.value;
 
+// Anchor beam start to beginning of the selected day
+const beamStartDate = new Date(
+  selectedDate + "T00:00:00"
+);
   const snap = await getDocs(q);
   for (const b of snap.docs) {
     await updateDoc(doc(db, "beams", b.id), {
@@ -133,16 +145,26 @@ addBeamBtn.addEventListener("click", async () => {
 
   // add new beam
   await addDoc(collection(db, "beams"), {
-    factoryId,
-    machineId: selectedMachine.id,
-    machineNumber: Number(selectedMachine.number),
-    beamNo,
-    totalMeters: meters,
-    isActive: true,
-    startDate: serverTimestamp(),
-    endDate: null,
-    createdAt: serverTimestamp(),
-  });
+  factoryId,
+
+  machineId: selectedMachine.id,
+  machineNumber: Number(selectedMachine.number),
+
+  beamNo,
+  totalMeters: meters,
+
+  isActive: true,
+
+  // 👇 BUSINESS DATE (can be backdated)
+  startDate: Timestamp.fromDate(beamStartDate),
+
+  // 👇 will be set when beam is closed later
+  endDate: null,
+
+  // 👇 SYSTEM TIMESTAMP (when record was created)
+  createdAt: serverTimestamp(),
+});
+
 
   alert("Beam added successfully");
   document.getElementById("beamNo").value = "";
@@ -170,3 +192,4 @@ async function calculateBeamStats(beamId, totalMeters) {
     shortagePercent,
   };
 }
+
