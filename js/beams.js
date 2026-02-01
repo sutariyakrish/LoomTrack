@@ -20,7 +20,12 @@ const addBeamSection = document.getElementById("addBeamSection");
 const addBeamBtn = document.getElementById("addBeamBtn");
 const beamStartDateInput =
   document.getElementById("beamStartDate");
+const selectedDate = beamStartDateInput.value;
 
+// Anchor beam start to beginning of the selected day
+const beamStartDate = new Date(
+  selectedDate + "T00:00:00"
+);
 // Default = today
 beamStartDateInput.value =
   new Date().toISOString().split("T")[0];
@@ -43,10 +48,6 @@ onAuthStateChanged(auth, async (user) => {
 
   loadMachines();
 });
-
-/* ---------- LOAD MACHINES ---------- */
-import { orderBy } from
-  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 async function loadMachines() {
   const q = query(
@@ -138,12 +139,7 @@ addBeamBtn.addEventListener("click", async () => {
     where("machineId", "==", selectedMachine.id),
     where("isActive", "==", true),
   );
-  const selectedDate = beamStartDateInput.value;
 
-// Anchor beam start to beginning of the selected day
-const beamStartDate = new Date(
-  selectedDate + "T00:00:00"
-);
   const snap = await getDocs(q);
   for (const b of snap.docs) {
     await updateDoc(doc(db, "beams", b.id), {
@@ -201,6 +197,7 @@ async function calculateBeamStats(beamId, totalMeters) {
     shortagePercent,
   };
 }
+
 
 
 
