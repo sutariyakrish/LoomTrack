@@ -17,7 +17,8 @@ import {
   deleteDoc,
   doc,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
+import { orderBy } from
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 const machineSelect = document.getElementById("machineSelect");
 const workerSelect = document.getElementById("workerSelect");
 const infoText = document.getElementById("infoText");
@@ -52,15 +53,24 @@ onAuthStateChanged(auth, async (user) => {
 /* ---------- LOAD MACHINES ---------- */
 async function loadMachines() {
   const snap = await getDocs(
-    collection(db, "factories", factoryId, "machines"),
+    collection(db, "factories", factoryId, "machines")
   );
 
   machineSelect.innerHTML = `<option value="">Select Machine</option>`;
 
-  snap.forEach((docSnap) => {
-    const m = docSnap.data();
+  const machines = snap.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  }));
+
+  // 🔥 FORCE NUMERIC SORT
+  machines.sort(
+    (a, b) => Number(a.machineNumber) - Number(b.machineNumber)
+  );
+
+  machines.forEach(m => {
     const option = document.createElement("option");
-    option.value = docSnap.id;
+    option.value = m.id;
     option.textContent = `Machine ${m.machineNumber}`;
     option.dataset.machineNumber = m.machineNumber;
     machineSelect.appendChild(option);
@@ -235,4 +245,5 @@ window.deleteProduction=async function deleteProduction(id) {
 
   alert("Entry deleted");
   loadBtn.click(); // reload same day
+
 }
