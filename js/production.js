@@ -77,6 +77,7 @@ async function loadMachines() {
   });
 }
 
+
 /* ---------- LOAD WORKERS ---------- */
 async function loadWorkers() {
   const q = query(
@@ -247,3 +248,4 @@ window.deleteProduction=async function deleteProduction(id) {
   loadBtn.click(); // reload same day
 
 }
+
