@@ -12,7 +12,8 @@ import {
 import { Timestamp } from
   "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
+import { orderBy } from
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 const machineSelect = document.getElementById("machineSelect");
 const beamInfo = document.getElementById("beamInfo");
 const addBeamSection = document.getElementById("addBeamSection");
@@ -46,20 +47,30 @@ onAuthStateChanged(auth, async (user) => {
 /* ---------- LOAD MACHINES ---------- */
 async function loadMachines() {
   const snap = await getDocs(
-    collection(db, "factories", factoryId, "machines"),
+    collection(db, "factories", factoryId, "machines")
   );
 
   machineSelect.innerHTML = `<option value="">Select Machine</option>`;
 
-  snap.forEach((docSnap) => {
-    const m = docSnap.data();
+  // 1️⃣ Collect machines
+  const machines = snap.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  }));
+
+  // 2️⃣ Sort by machineNumber (ascending)
+  machines.sort((a, b) => a.machineNumber - b.machineNumber);
+
+  // 3️⃣ Render in order
+  machines.forEach(m => {
     const option = document.createElement("option");
-    option.value = docSnap.id;
+    option.value = m.id;
     option.textContent = `Machine ${m.machineNumber}`;
     option.dataset.machineNumber = m.machineNumber;
     machineSelect.appendChild(option);
   });
 }
+
 
 /* ---------- MACHINE CHANGE ---------- */
 machineSelect.addEventListener("change", async () => {
@@ -192,4 +203,5 @@ async function calculateBeamStats(beamId, totalMeters) {
     shortagePercent,
   };
 }
+
 
