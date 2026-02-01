@@ -20,12 +20,9 @@ const addBeamSection = document.getElementById("addBeamSection");
 const addBeamBtn = document.getElementById("addBeamBtn");
 const beamStartDateInput =
   document.getElementById("beamStartDate");
-const selectedDate = beamStartDateInput.value;
 
-// Anchor beam start to beginning of the selected day
-const beamStartDate = new Date(
-  selectedDate + "T00:00:00"
-);
+
+
 // Default = today
 beamStartDateInput.value =
   new Date().toISOString().split("T")[0];
@@ -133,7 +130,14 @@ async function checkActiveBeam() {
 addBeamBtn.addEventListener("click", async () => {
   const beamNo = document.getElementById("beamNo").value.trim();
   const meters = Number(document.getElementById("beamMeters").value);
+   const selectedDate = beamStartDateInput.value;
 
+  if (!selectedDate) {
+    alert("Please select beam start date");
+    return;
+  }
+
+  const beamStartDate = new Date(selectedDate + "T00:00:00");
   if (!beamNo || meters <= 0) {
     alert("Enter valid beam details");
     return;
@@ -204,6 +208,7 @@ async function calculateBeamStats(beamId, totalMeters) {
     shortagePercent,
   };
 }
+
 
 
 
