@@ -1,36 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LoomTrack | Login</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/firebase.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <main class="container">
-        <div class="card">
-            <div class="brand">               
-                <h1>LoomTrack</h1>
-            </div>
-            <form action="#">
-                <div class="input-group">
-                    <i class="far fa-envelope"></i>
-                    <input id="email" type="email" placeholder="Email" required>
-                </div>
-
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input id="password" type="password" placeholder="Password" required>
-                    <i class="fas fa-lock-alt lock-icon-right"></i>
-                </div>
-                <div  style="color:red" id="error"></div>
-                <button type="submit" class="login-btn">LOGIN</button>
-            </form>
+      <div class="card">
+        <div class="brand">
+          <h1>LoomTrack</h1>
+          <p class="brand-subtitle">Factory Management System</p>
         </div>
-    </main>
 
-</body>
+        <form novalidate>
+          <div class="input-group">
+            <i class="far fa-envelope"></i>
+            <input id="email" type="email" placeholder="Email" required />
+          </div>
+
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input
+              id="password"
+              type="password"
+              placeholder="Password"
+              required
+            />
+            <i class="fas fa-lock-alt lock-icon-right"></i>
+          </div>
+          <div id="error"></div>
+
+          <button type="submit" class="login-btn">LOGIN</button>
+        </form>
+      </div>
+    </main>
+  </body>
 </html>

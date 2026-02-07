@@ -9,23 +9,15 @@ import {
   serverTimestamp,
   doc,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { Timestamp } from
-  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { loadMachinesOnce } from "./loadMachines.js";
+
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { orderBy } from
-  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-const machineSelect = document.getElementById("machineSelect");
+
+const machineInput = document.getElementById("machineNumberInput");
+
 const beamInfo = document.getElementById("beamInfo");
 const addBeamSection = document.getElementById("addBeamSection");
 const addBeamBtn = document.getElementById("addBeamBtn");
-const beamStartDateInput =
-  document.getElementById("beamStartDate");
-
-
-
-// Default = today
-beamStartDateInput.value =
-  new Date().toISOString().split("T")[0];
 
 let factoryId = null;
 let selectedMachine = null;
@@ -43,57 +35,44 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  loadMachines();
+  // ✅ add listener ONLY AFTER factoryId is ready
+  machineInput.addEventListener("change", handleMachineInput);
 });
 
-async function loadMachines() {
-  const snap = await getDocs(
-    collection(db, "factories", factoryId, "machines")
-  );
+/* ---------- LOAD MACHINES ---------- */
 
-  machineSelect.innerHTML = `<option value="">Select Machine</option>`;
+async function handleMachineInput() {
+  if (!factoryId) return; // 🛡️ safety net
 
-  const machines = snap.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  }));
+  const machineNo = Number(machineInput.value);
+  if (!machineNo) return;
 
-  // 🔥 FORCE NUMERIC SORT
-  machines.sort(
-    (a, b) => Number(a.machineNumber) - Number(b.machineNumber)
-  );
+  const machines = await loadMachinesOnce(factoryId);
 
-  machines.forEach(m => {
-    const option = document.createElement("option");
-    option.value = m.id;
-    option.textContent = `Machine ${m.machineNumber}`;
-    option.dataset.machineNumber = m.machineNumber;
-    machineSelect.appendChild(option);
-  });
-}
+  const machine = machines.find((m) => m.machineNumber === machineNo);
 
-
-
-
-/* ---------- MACHINE CHANGE ---------- */
-machineSelect.addEventListener("change", async () => {
-  const machineId = machineSelect.value;
-  if (!machineId) {
-    beamInfo.textContent = "";
-    addBeamSection.style.display = "none";
+  if (!machine) {
+    alert("Invalid machine number");
+    selectedMachine = null;
     return;
   }
 
   selectedMachine = {
-    id: machineId,
-    number: machineSelect.selectedOptions[0].dataset.machineNumber,
+    id: machine.id,
+    number: Number(machine.machineNumber),
   };
+  if (!selectedMachine?.id) {
+    alert("Machine loaded but ID missing. Reload page.");
+    return;
+  }
 
   checkActiveBeam();
-});
+}
 
 /* ---------- CHECK ACTIVE BEAM ---------- */
 async function checkActiveBeam() {
+  if (!selectedMachine) return;
+
   const q = query(
     collection(db, "beams"),
     where("factoryId", "==", factoryId),
@@ -104,46 +83,46 @@ async function checkActiveBeam() {
   const snap = await getDocs(q);
 
   if (snap.empty) {
-    beamInfo.textContent = "No active beam on this machine";
+    beamInfo.textContent = `No active beam on Machine ${selectedMachine.number}`;
     addBeamSection.style.display = "block";
-  } else {
-    const beamDoc = snap.docs[0];
-    const beam = beamDoc.data();
-
-    beamInfo.innerHTML = "Calculating beam stats...";
-
-    const stats = await calculateBeamStats(beamDoc.id, beam.totalMeters);
-
-    beamInfo.innerHTML = `
-  <strong>Active Beam:</strong> ${beam.beamNo}<br>
-  <strong>Total Meters:</strong> ${beam.totalMeters} m<br>
-  <strong>Produced:</strong> ${stats.produced} m<br>
-  <strong>Bhidan:</strong> ${stats.bhidan} m<br>
-  <strong>Shortage %:</strong> ${stats.shortagePercent} %
-`;
-
-    addBeamSection.style.display = "block";
+    return;
   }
+
+  const beamDoc = snap.docs[0];
+  const beam = beamDoc.data();
+
+  beamInfo.innerHTML = "Calculating beam stats...";
+
+  const stats = await calculateBeamStats(beamDoc.id, beam.totalMeters);
+
+  beamInfo.innerHTML = `
+    <strong>Machine Number:</strong> ${beam.machineNumber}<br>
+    <strong>Active Beam:</strong> ${beam.beamNo}<br>
+    <strong>Total Meters:</strong> ${beam.totalMeters} m<br>
+    <strong>Produced:</strong> ${stats.produced} m<br>
+    <strong>Bhidan:</strong> ${stats.bhidan} m<br>
+    <strong>Shortage %:</strong> ${stats.shortagePercent} %
+  `;
+
+  addBeamSection.style.display = "block";
 }
 
 /* ---------- ADD NEW BEAM ---------- */
 addBeamBtn.addEventListener("click", async () => {
-  const beamNo = document.getElementById("beamNo").value.trim();
-  const meters = Number(document.getElementById("beamMeters").value);
-   const selectedDate = beamStartDateInput.value;
-
-  if (!selectedDate) {
-    alert("Please select beam start date");
+  if (!selectedMachine) {
+    alert("Enter a valid machine number first");
     return;
   }
 
-  const beamStartDate = new Date(selectedDate + "T00:00:00");
+  const beamNo = document.getElementById("beamNo").value.trim();
+  const meters = Number(document.getElementById("beamMeters").value);
+
   if (!beamNo || meters <= 0) {
     alert("Enter valid beam details");
     return;
   }
 
-  // close old beam
+  // Close old active beam
   const q = query(
     collection(db, "beams"),
     where("factoryId", "==", factoryId),
@@ -152,6 +131,7 @@ addBeamBtn.addEventListener("click", async () => {
   );
 
   const snap = await getDocs(q);
+
   for (const b of snap.docs) {
     await updateDoc(doc(db, "beams", b.id), {
       isActive: false,
@@ -159,35 +139,27 @@ addBeamBtn.addEventListener("click", async () => {
     });
   }
 
-  // add new beam
+  // ✅ ADD NEW BEAM (ONLY FROM selectedMachine)
   await addDoc(collection(db, "beams"), {
-  factoryId,
-
-  machineId: selectedMachine.id,
-  machineNumber: Number(selectedMachine.number),
-
-  beamNo,
-  totalMeters: meters,
-
-  isActive: true,
-
-  // 👇 BUSINESS DATE (can be backdated)
-  startDate: Timestamp.fromDate(beamStartDate),
-
-  // 👇 will be set when beam is closed later
-  endDate: null,
-
-  // 👇 SYSTEM TIMESTAMP (when record was created)
-  createdAt: serverTimestamp(),
-});
-
+    factoryId,
+    machineId: selectedMachine.id,
+    machineNumber: Number(selectedMachine.number),
+    beamNo,
+    totalMeters: meters,
+    isActive: true,
+    startDate: serverTimestamp(),
+    endDate: null,
+    createdAt: serverTimestamp(),
+  });
 
   alert("Beam added successfully");
+
   document.getElementById("beamNo").value = "";
   document.getElementById("beamMeters").value = "";
 
   checkActiveBeam();
 });
+
 async function calculateBeamStats(beamId, totalMeters) {
   const q = query(collection(db, "production"), where("beamId", "==", beamId));
 
@@ -208,9 +180,3 @@ async function calculateBeamStats(beamId, totalMeters) {
     shortagePercent,
   };
 }
-
-
-
-
-
-

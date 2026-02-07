@@ -8,6 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { formatWorkerLabel } from "./workerLabel.js";
 
 /* ---------------- ELEMENTS ---------------- */
 const dateMode = document.getElementById("dateMode");
@@ -162,7 +163,8 @@ function renderWorkerReport(data) {
 
   const map = {};
   data.forEach((d) => {
-    map[d.workerName] = (map[d.workerName] || 0) + d.meters;
+    const label = d.workerLabel || d.workerName;
+    map[label] = (map[label] || 0) + d.meters;
   });
 
   reportBody.innerHTML = "";
@@ -219,7 +221,6 @@ function renderMachineReport(data) {
       `;
     });
 }
-
 
 function renderShiftReport(data) {
   reportHead.innerHTML = `
@@ -314,7 +315,7 @@ async function renderBeamReport(data) {
 
     reportBody.innerHTML += `
       <tr>
-        <td>${beam.beamNo}</td>
+        <td data-label="Beam No">${beam.beamNo}</td>
         <td>Machine ${beam.machineNumber}</td>
         <td>${beam.totalMeters}</td>
         <td>${produced}</td>

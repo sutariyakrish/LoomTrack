@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LoomTrack | Production</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/workers.css" />
+  
   </head>
   <body>
     <!-- NAVBAR -->
@@ -31,12 +31,10 @@
     <div class="container">
       <div class="card wide-card">
         <h2 class="page-title">Production Entry</h2>
-
         <div class="form-row">
-          <select id="machineSelect">
-            <option value="">Select Machine</option>
-          </select>
-
+          <input type="date" id="productionDate" />
+        </div>
+        <div class="form-row">
           <select id="workerSelect">
             <option value="">Select Worker</option>
           </select>
@@ -47,18 +45,26 @@
             <option value="Night">Night</option>
           </select>
         </div>
-
-        <div class="form-row">
-          <input type="text" id="takaNo" placeholder="Taka No" />
-          <input type="number" id="meters" placeholder="Produced Meters" />
-          <input type="date" id="productionDate" />
-
-          <button class="primary-btn" id="saveBtn">Save</button>
+        <div class="table-wrapper">
+          <table class="data-table bulk-table">
+            <thead>
+              <tr>
+                <th>Machine</th>
+                <th>Beam</th>
+                <th>Taka No</th>
+                <th>Meters</th>
+              </tr>
+            </thead>
+            <tbody id="bulkTableBody"></tbody>
+          </table>
         </div>
+
+        <button id="saveBulkBtn" class="primary-btn save-production-btn">
+          Save Production
+        </button>
 
         <p id="infoText" class="info-text"></p>
         <div class="form-row">
-          <input type="date" id="productionDate" />
           <button class="primary-btn" id="loadProductionBtn">
             Load Production
           </button>

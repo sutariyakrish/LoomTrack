@@ -2,21 +2,21 @@
 <html>
   <head>
     <title>LoomTrack | Worker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/workers.css" />
+ 
   </head>
   <body>
     <!-- NAVBAR -->
     <nav class="navbar">
       <div class="nav-toggle" id="navToggle">☰</div>
 
-      <div class="nav-left" >
+      <div class="nav-left">
         <span class="logo">LoomTrack</span>
       </div>
 
-      <div class="nav-center" id="navMenu">        
+      <div class="nav-center" id="navMenu">
         <a href="dashboard.html">Dashboard</a>
         <a class="act" href="workers.html">Workers</a>
         <a href="beams.html">Beams</a>
@@ -37,12 +37,28 @@
         <!-- ADD WORKER -->
         <div class="form-row">
           <input type="text" id="workerName" placeholder="Worker Name" />
-          <input
-            type="text"
-            id="workerPhone"
-            placeholder="Phone Number (optional)"
-          />
           <button id="addWorkerBtn" class="primary-btn">Add Worker</button>
+        </div>
+        <div id="assignSection" style="display: none">
+          <h3 class="section-title">Assign Machine Range</h3>
+
+          <div class="form-row">
+            <input type="number" id="fromMachine" placeholder="From Machine" />
+            <input type="number" id="toMachine" placeholder="To Machine" />
+          </div>
+
+          <div class="form-row">
+            <button id="saveRangeBtn" class="secondary-btn">Save Range</button>
+            <button id="saveAssignmentBtn" class="primary-btn">
+              Save Assignment
+            </button>
+          </div>
+
+          <h4 id="assignWorkerName" class="assign-worker"></h4>
+          <p id="rangeError" class="error-text"></p>
+
+          <h4 class="section-subtitle">Assigned Ranges</h4>
+          <ul id="rangeList" class="range-list"></ul>
         </div>
 
         <p id="msg" class="info-text"></p>
@@ -54,7 +70,6 @@
               <tr>
                 <th>No</th>
                 <th>Worker Name</th>
-                <th>Phone Number</th>
                 <th>Action</th>
               </tr>
             </thead>
