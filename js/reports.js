@@ -162,10 +162,12 @@ function renderWorkerReport(data) {
   `;
 
   const map = {};
-  data.forEach((d) => {
-    const label = d.workerLabel || d.workerName;
-    map[label] = (map[label] || 0) + d.meters;
-  });
+  data.forEach(d => {
+  if (!d.countInWorker) return;
+  const label = d.workerLabel || d.workerName;
+  map[label] = (map[label] || 0) + d.meters;
+});
+
 
   reportBody.innerHTML = "";
 
@@ -202,6 +204,8 @@ function renderMachineReport(data) {
   data.forEach((d) => {
     const key = `Machine ${d.machineNumber}`;
     map[key] = (map[key] || 0) + d.meters;
+    if (!d.countInWorker) return;
+
   });
 
   reportBody.innerHTML = "";
@@ -234,6 +238,8 @@ function renderShiftReport(data) {
 
   data.forEach((d) => {
     map[d.shift] = (map[d.shift] || 0) + d.meters;
+    if (!d.countInWorker) return;
+
   });
 
   reportBody.innerHTML = "";
@@ -445,6 +451,8 @@ function renderTakaReport(data) {
   data.forEach((d) => {
     const taka = d.takaNo;
     map[taka] = (map[taka] || 0) + d.meters;
+    if (!d.countInWorker) return;
+
   });
 
   reportBody.innerHTML = "";

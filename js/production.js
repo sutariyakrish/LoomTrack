@@ -24,7 +24,8 @@ workerSelect.addEventListener("change", tryLoadBulkTable);
 productionDateInput.addEventListener("change", tryLoadBulkTable);
 shiftSelect.addEventListener("change", tryLoadBulkTable);
 const bulkTableBody = document.getElementById("bulkTableBody");
-let isEditMode = false;
+cache.beams = cache.beams || [];
+
 
 /* ---------- AUTH + FACTORY ---------- */
 onAuthStateChanged(auth, async (user) => {
@@ -41,7 +42,8 @@ onAuthStateChanged(auth, async (user) => {
 
   await loadMachinesOnce();
   await loadAssignmentsOnce();
-  await loadActiveBeamsOnce();
+  await loadBeamsOnce();
+
   loadWorkers();
 });
 async function loadMachinesOnce() {
@@ -70,25 +72,22 @@ async function loadAssignmentsOnce() {
     cache.workerLabels[a.workerId] = formatWorkerLabel(a.workerName, a.ranges);
   });
 }
-async function loadActiveBeamsOnce() {
-  if (Object.keys(cache.activeBeams).length) return;
+async function loadBeamsOnce() {
+  if (cache.beams?.length) return;
 
   const q = query(
     collection(db, "beams"),
-    where("factoryId", "==", factoryId),
-    where("isActive", "==", true),
+    where("factoryId", "==", factoryId)
   );
 
   const snap = await getDocs(q);
 
-  snap.forEach((d) => {
-    const b = d.data();
-    cache.activeBeams[b.machineNumber] = {
-      beamId: d.id,
-      beamNo: b.beamNo,
-    };
-  });
+  cache.beams = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 }
+
 
 function getEntryTimestamp(dateStr, shift) {
   if (shift === "Day") {
@@ -204,34 +203,23 @@ async function renderBulkRows(machineNumbers) {
   const entryTime = getEntryTimestamp(date, shift);
 
   for (const machineNo of machineNumbers) {
-    const beam = cache.activeBeams[machineNo];
+    const entryDate = new Date(date + "T00:00:00");
+    const beam = resolveBeamForDate(machineNo, entryDate);
+
     if (!beam) {
-      infoText.textContent = `❌ Machine ${machineNo} has no active beam. Add beam first.`;
+      infoText.textContent =
+        `❌ No beam found for Machine ${machineNo} on selected date`;
       bulkTableBody.innerHTML = "";
       return;
     }
 
     const lastTaka = await getLastTakaForMachine(machineNo, entryTime);
 
-    const tr = document.createElement("tr");
-    tr.dataset.machineNumber = machineNo;
-    tr.dataset.beamId = beam.beamId;
-    tr.dataset.beamNo = beam.beamNo;
-
-    tr.innerHTML = `
-      <td>Machine ${machineNo}</td>
-      <td>${beam.beamNo}</td>
-      <td>
-        <input class="taka-input" value="${lastTaka}">
-      </td>
-      <td>
-        <input class="meter-input" type="number" min="0">
-      </td>
-    `;
-
+    const tr = createRow(machineNo, beam, lastTaka);
     bulkTableBody.appendChild(tr);
   }
 }
+
 
 setTimeout(() => {
   const firstMeter = document.querySelector(".meter-input");
@@ -243,6 +231,8 @@ document.getElementById("saveBulkBtn").addEventListener("click", async () => {
   if (!rows.length) return;
 
   const batch = writeBatch(db);
+  
+
 
   const workerId = workerSelect.value;
   const workerName = workerSelect.selectedOptions[0].dataset.workerName;
@@ -252,6 +242,9 @@ document.getElementById("saveBulkBtn").addEventListener("click", async () => {
   const createdAt = Timestamp.fromDate(getEntryTimestamp(date, shift));
 
   for (const row of rows) {
+    const entryType = row.querySelector(".entry-type").value;
+
+const countInWorker = entryType === "normal";
     const taka = row.querySelector(".taka-input").value.trim();
     const metersRaw = row.querySelector(".meter-input").value.trim();
 
@@ -279,17 +272,25 @@ document.getElementById("saveBulkBtn").addEventListener("click", async () => {
       ref,
       {
         factoryId,
-        machineNumber: Number(row.dataset.machineNumber),
-        beamId: row.dataset.beamId,
-        beamNo: row.dataset.beamNo,
-        workerId,
-        workerName,
-        workerLabel: cache.workerLabels[workerId],
-        takaNo: taka,
-        meters,
-        shift,
-        createdAt,
-        updatedAt: Timestamp.now(),
+
+  machineNumber: Number(row.dataset.machineNumber),
+  beamId: row.dataset.beamId,
+  beamNo: row.dataset.beamNo,
+
+  workerId: countInWorker ? workerId : null,
+  workerName: countInWorker ? workerName : "SYSTEM",
+  workerLabel: countInWorker ? cache.workerLabels[workerId] : "Adjustment",
+
+  takaNo: taka,
+  meters,
+
+  shift,
+  createdAt,
+
+  entryType,
+  countInWorker,
+
+  updatedAt: Timestamp.now()
       },
       { merge: true },
     );
@@ -301,16 +302,57 @@ document.getElementById("saveBulkBtn").addEventListener("click", async () => {
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key !== "Enter") return;
+  const active = document.activeElement;
 
-  const inputs = Array.from(document.querySelectorAll(".meter-input"));
-  const index = inputs.indexOf(document.activeElement);
+  if (!active) return;
 
-  if (index !== -1 && inputs[index + 1]) {
-    inputs[index + 1].focus();
+  // ENTER → move forward
+  if (e.key === "Enter") {
     e.preventDefault();
+
+    // From taka → meters
+    if (active.classList.contains("taka-input")) {
+      active.closest("tr")
+        .querySelector(".meter-input")
+        .focus();
+      return;
+    }
+
+    // From meters → next row taka
+    if (active.classList.contains("meter-input")) {
+      const row = active.closest("tr");
+      const next = row.nextElementSibling;
+
+      if (next) {
+        next.querySelector(".taka-input")?.focus();
+      }
+      return;
+    }
+  }
+
+  // + → add new taka for same machine
+  if (e.key === "+" || e.key === "=") {
+    const row = active.closest("tr");
+    if (!row) return;
+
+    const machineNo = row.dataset.machineNumber;
+    const beam = {
+      id: row.dataset.beamId,
+      beamNo: row.dataset.beamNo
+    };
+
+    const newRow = createRow(machineNo, beam);
+    row.after(newRow);
+
+    newRow.querySelector(".taka-input").focus();
+  }
+
+  // CTRL + ENTER → Save
+  if (e.key === "Enter" && e.ctrlKey) {
+    document.getElementById("saveBulkBtn").click();
   }
 });
+
 function getShiftWindow(dateStr, shift) {
   const day = new Date(dateStr + "T00:00:00");
 
@@ -333,39 +375,34 @@ function getShiftWindow(dateStr, shift) {
 
 function renderBulkFromExisting(docs) {
   bulkTableBody.innerHTML = "";
-  const sortedDocs = docs.sort(
-    (a, b) => a.data().machineNumber - b.data().machineNumber,
-  );
 
-  sortedDocs.forEach((docSnap) => {
-    const d = docSnap.data();
+  docs
+    .sort((a, b) => a.data().machineNumber - b.data().machineNumber)
+    .forEach((docSnap) => {
+      const d = docSnap.data();
 
-    const tr = document.createElement("tr");
+      const tr = createRow(
+        d.machineNumber,
+        { id: d.beamId, beamNo: d.beamNo },
+        d.takaNo
+      );
 
-    tr.dataset.productionId = docSnap.id; // 👈 EDIT MODE
-    tr.dataset.machineNumber = d.machineNumber;
-    tr.dataset.beamId = d.beamId;
-    tr.dataset.beamNo = d.beamNo;
+      tr.dataset.productionId = docSnap.id;
 
-    tr.innerHTML = `
-      <td>Machine ${d.machineNumber}</td>
-      <td>${d.beamNo}</td>
-      <td>
-        <input type="text"
-               class="taka-input"
-               value="${d.takaNo}">
-      </td>
-      <td>
-        <input type="number"
-               class="meter-input"
-               value="${d.meters}"
-               min="0">
-      </td>
-    `;
+      tr.querySelector(".meter-input").value = d.meters;
+      tr.querySelector(".entry-type").value =
+        d.entryType || "normal";
+        const entryType = d.entryType || "normal";
 
-    bulkTableBody.appendChild(tr);
-  });
+if (entryType === "adjustment") {
+  tr.classList.add("adjustment");
 }
+
+
+      bulkTableBody.appendChild(tr);
+    });
+}
+
 async function loadProductionForEditOrCreate(workerId, date, shift) {
   const entryTime = getEntryTimestamp(date, shift);
 
@@ -392,3 +429,78 @@ async function loadProductionForEditOrCreate(workerId, date, shift) {
     await loadMachinesForWorker(workerId);
   }
 }
+function resolveBeamForDate(machineNumber, entryDate) {
+  
+
+  const beams = cache.beams
+    .filter(b => b.machineNumber === machineNumber)
+    .filter(b => {
+      if (!b.startDate) return false;
+      const start = b.startDate.toDate();
+      
+
+      const end = b.endDate ? b.endDate.toDate() : null;
+      return start <= entryDate && (!end || entryDate < end);
+    })
+    .sort((a, b) => b.startDate.toMillis() - a.startDate.toMillis());
+
+  return beams[0] || null;
+}
+bulkTableBody.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("add-taka-btn")) return;
+
+  const row = e.target.closest("tr");
+
+  const machineNo = row.dataset.machineNumber;
+  const beam = {
+    id: row.dataset.beamId,
+    beamNo: row.dataset.beamNo
+  };
+
+  const newRow = createRow(machineNo, beam);
+  row.after(newRow);
+});
+function createRow(machineNo, beam, lastTaka = "") {
+  const tr = document.createElement("tr");
+
+  tr.dataset.machineNumber = machineNo;
+  tr.dataset.beamId = beam.id;
+  tr.dataset.beamNo = beam.beamNo;
+
+  tr.innerHTML = `
+    <td>Machine ${machineNo}</td>
+    <td>${beam.beamNo}</td>
+
+    <td>
+      <input class="taka-input" value="${lastTaka}">
+    </td>
+
+    <td>
+      <input class="meter-input" type="number" min="0">
+    </td>
+
+    <td>
+      <select class="entry-type">
+        <option value="normal">Normal</option>
+        <option value="adjustment">Adjustment</option>
+      </select>
+    </td>
+
+    <td>
+      <button type="button" class="add-taka-btn">+</button>
+    </td>
+  `;
+
+  return tr;
+}
+bulkTableBody.addEventListener("change", (e) => {
+  if (!e.target.classList.contains("entry-type")) return;
+
+  const row = e.target.closest("tr");
+
+  if (e.target.value === "adjustment") {
+    row.classList.add("adjustment");
+  } else {
+    row.classList.remove("adjustment");
+  }
+});

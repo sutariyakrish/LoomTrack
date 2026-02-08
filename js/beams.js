@@ -7,6 +7,7 @@ import {
   addDoc,
   updateDoc,
   serverTimestamp,
+  Timestamp,
   doc,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { loadMachinesOnce } from "./loadMachines.js";
@@ -18,6 +19,7 @@ const machineInput = document.getElementById("machineNumberInput");
 const beamInfo = document.getElementById("beamInfo");
 const addBeamSection = document.getElementById("addBeamSection");
 const addBeamBtn = document.getElementById("addBeamBtn");
+let activeBeamDocId = null;
 
 let factoryId = null;
 let selectedMachine = null;
@@ -78,6 +80,8 @@ async function checkActiveBeam() {
     where("factoryId", "==", factoryId),
     where("machineId", "==", selectedMachine.id),
     where("isActive", "==", true),
+    where("endDate", "==", null),
+
   );
 
   const snap = await getDocs(q);
@@ -88,24 +92,72 @@ async function checkActiveBeam() {
     return;
   }
 
-  const beamDoc = snap.docs[0];
-  const beam = beamDoc.data();
+const beamDoc = snap.docs[0];
+const beam = beamDoc.data();
+activeBeamDocId = beamDoc.id;
+
 
   beamInfo.innerHTML = "Calculating beam stats...";
 
   const stats = await calculateBeamStats(beamDoc.id, beam.totalMeters);
 
   beamInfo.innerHTML = `
+  <div id="beamView">
     <strong>Machine Number:</strong> ${beam.machineNumber}<br>
     <strong>Active Beam:</strong> ${beam.beamNo}<br>
     <strong>Total Meters:</strong> ${beam.totalMeters} m<br>
     <strong>Produced:</strong> ${stats.produced} m<br>
     <strong>Bhidan:</strong> ${stats.bhidan} m<br>
     <strong>Shortage %:</strong> ${stats.shortagePercent} %
-  `;
+    <br><br>
+    <button id="editBeamBtn" class="primary-btn">Edit Beam</button>
+  </div>
+
+  <div id="beamEdit" style="display:none">
+    <input id="editBeamNo" value="${beam.beamNo}" placeholder="Beam No">
+    <input id="editBeamMeters" type="number" value="${beam.totalMeters}" placeholder="Total Meters">
+    <br><br>
+    <button id="saveBeamEditBtn" class="primary-btn">Save</button>
+    <button id="cancelBeamEditBtn" class="secondary-btn">Cancel</button>
+  </div>
+`;
+
 
   addBeamSection.style.display = "block";
 }
+document.addEventListener("click", async (e) => {
+
+  // Enter edit mode
+  if (e.target.id === "editBeamBtn") {
+    document.getElementById("beamView").style.display = "none";
+    document.getElementById("beamEdit").style.display = "block";
+  }
+
+  // Cancel edit
+  if (e.target.id === "cancelBeamEditBtn") {
+    checkActiveBeam(); // reload original data
+  }
+
+  // Save edit
+  if (e.target.id === "saveBeamEditBtn") {
+    const newBeamNo = document.getElementById("editBeamNo").value.trim();
+    const newMeters = Number(document.getElementById("editBeamMeters").value);
+
+    if (!newBeamNo || newMeters <= 0) {
+      alert("Invalid beam details");
+      return;
+    }
+
+    await updateDoc(doc(db, "beams", activeBeamDocId), {
+      beamNo: newBeamNo,
+      totalMeters: newMeters,
+      updatedAt: serverTimestamp(),
+    });
+
+    alert("Beam updated successfully");
+    checkActiveBeam();
+  }
+});
 
 /* ---------- ADD NEW BEAM ---------- */
 addBeamBtn.addEventListener("click", async () => {
@@ -124,33 +176,51 @@ addBeamBtn.addEventListener("click", async () => {
 
   // Close old active beam
   const q = query(
-    collection(db, "beams"),
-    where("factoryId", "==", factoryId),
-    where("machineId", "==", selectedMachine.id),
-    where("isActive", "==", true),
-  );
+  collection(db, "beams"),
+  where("factoryId", "==", factoryId),
+  where("machineId", "==", selectedMachine.id),
+  where("endDate", "==", null)
+);
 
-  const snap = await getDocs(q);
+const snap = await getDocs(q);
+ const startDateStr = document.getElementById("beamStartDate").value;
+if (!startDateStr) {
+  alert("Select beam start date");
+  return;
+}
 
-  for (const b of snap.docs) {
-    await updateDoc(doc(db, "beams", b.id), {
-      isActive: false,
-      endDate: serverTimestamp(),
-    });
-  }
+const startDate = Timestamp.fromDate(
+  new Date(startDateStr + "T00:00:00")
+);
+
+for (const b of snap.docs) {
+  await updateDoc(doc(db, "beams", b.id), {
+    endDate: startDate,   // 👈 close at new beam start
+    isActive: false,
+    updatedAt: serverTimestamp()
+  });
+}
+
+ 
+
 
   // ✅ ADD NEW BEAM (ONLY FROM selectedMachine)
   await addDoc(collection(db, "beams"), {
-    factoryId,
-    machineId: selectedMachine.id,
-    machineNumber: Number(selectedMachine.number),
-    beamNo,
-    totalMeters: meters,
-    isActive: true,
-    startDate: serverTimestamp(),
-    endDate: null,
-    createdAt: serverTimestamp(),
-  });
+  factoryId,
+  machineId: selectedMachine.id,
+  machineNumber: selectedMachine.number,
+
+  beamNo,
+  totalMeters: meters,
+
+
+  startDate,
+  endDate: null,
+  isActive: true,
+
+  createdAt: serverTimestamp()
+});
+
 
   alert("Beam added successfully");
 
