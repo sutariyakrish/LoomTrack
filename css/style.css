@@ -41,7 +41,7 @@
 /* ================= GLOBAL NO HORIZONTAL SCROLL ================= */
 html, body {
   max-width: 100%;
-  overflow-x: hidden;
+
 }
 
 body {
@@ -74,7 +74,7 @@ body {
 .card,
 .wide-card {
   max-width: 100%;
-  overflow-x: hidden;
+
 }
 
 .wide-card {  
@@ -157,7 +157,7 @@ select:focus {
 }
 .table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: visible !important;
 }
 
 .data-table {
@@ -915,30 +915,29 @@ body > .container {
 /* Force table to fit container */
 .bulk-table {
   table-layout: fixed;
-  width: 100%;
-  min-width: 100%; /* prevent overflow expansion */
 }
 
-/* Define column proportions */
 .bulk-table th:nth-child(1),
-.bulk-table td:nth-child(1) {
-  width: 20%; /* Machine */
-}
+.bulk-table td:nth-child(1) { width: 18%; }
 
 .bulk-table th:nth-child(2),
-.bulk-table td:nth-child(2) {
-  width: 20%; /* Beam */
-}
+.bulk-table td:nth-child(2) { width: 18%; }
 
 .bulk-table th:nth-child(3),
-.bulk-table td:nth-child(3) {
-  width: 30%; /* Taka No */
-}
+.bulk-table td:nth-child(3) { width: 24%; }
 
 .bulk-table th:nth-child(4),
-.bulk-table td:nth-child(4) {
-  width: 30%; /* Meters */
+.bulk-table td:nth-child(4) { width: 18%; }
+
+.bulk-table th:nth-child(5),
+.bulk-table td:nth-child(5) { width: 18%; }
+
+.bulk-table th:nth-child(6),
+.bulk-table td:nth-child(6) {
+  width: 10%;
+  text-align: center;
 }
+
 
 /* Inputs must not force width */
 .bulk-table input {
@@ -955,3 +954,48 @@ body > .container {
   text-overflow: ellipsis;
 }
 
+/* ===== PRODUCTION BULK ENTRY TABLE FIX ===== */
+
+#bulkTableBody tr {
+  display: table-row !important;
+}
+
+#bulkTableBody td {
+  display: table-cell !important;
+  vertical-align: middle;
+}
+#bulkTableBody td:last-child {
+  min-width: 50px;
+  text-align: center;
+}
+.add-taka-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  font-weight: bold;
+
+  background: #2563eb;
+  color: #fff;
+
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-taka-btn:hover {
+  background: #1e40af;
+}
+.table-wrapper {
+  overflow-x: auto !important;
+}
+
+.bulk-table {
+  min-width: 100%;
+}
+.bulk-table tr.adjustment {
+  background: #fff7ed;
+}
+
+.entry-type {
+  font-size: 12px;
+}
