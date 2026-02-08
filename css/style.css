@@ -1,4 +1,4 @@
-:root {
+:root {  
   /* Brand */
   --primary: #1f3a5f;
   --primary-600: #274c77;
@@ -918,7 +918,7 @@ body > .container {
 }
 
 .bulk-table th:nth-child(1),
-.bulk-table td:nth-child(1) { width: 18%; }
+.bulk-table td:nth-child(1) { width: 25%; }
 
 .bulk-table th:nth-child(2),
 .bulk-table td:nth-child(2) { width: 18%; }
@@ -999,3 +999,4 @@ body > .container {
 .entry-type {
   font-size: 12px;
 }
+
